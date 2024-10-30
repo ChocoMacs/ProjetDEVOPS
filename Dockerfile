@@ -9,7 +9,7 @@ RUN apt-get update && \
 WORKDIR /var/www/html
 
 # Initialiser un dépôt git et configurer le sparse checkout pour ne récupérer que le dossier 'application'
-RUN git clone https://ChocoMacs/ProjetDEVOPS/Application
+RUN git clone https://ChocoMacs/ProjetDEVOPS.git
 RUN cd Application && cp * /var/www/html/
 # Exposer les ports pour Apache
 EXPOSE 81 
