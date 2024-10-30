@@ -3,7 +3,7 @@ FROM ubuntu:latest
 
 # Installer les dépendances nécessaires
 RUN apt-get update && \
-    apt-get install -y git wget apache2 libapache2-mod-php php php-mysql mysql
+    apt-get install -y git wget apache2 libapache2-mod-php php php-mysql mysql-server
 
 ENTRYPOINT /usr/sbin/apache2ctl -D FOREGROUND
 
