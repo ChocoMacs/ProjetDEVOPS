@@ -16,7 +16,7 @@ RUN git init && \
     git pull origin main
 
 # Exposer les ports pour Apache
-EXPOSE 81  # Port pour Apache
+EXPOSE 81 
 
 # Commande à exécuter lors du démarrage du conteneur
 CMD ["apache2ctl", "-D", "FOREGROUND"]
