@@ -10,3 +10,4 @@ RUN apt-get update && \
 
 # Démarrer Apache en mode non-bloquant
 CMD ["apachectl", "-D", "FOREGROUND"]
+ 
