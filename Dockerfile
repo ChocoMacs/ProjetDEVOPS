@@ -1,5 +1,5 @@
-# Dockerfile pour installer XAMPP
-FROM php:7.4-apache
+# Utiliser une image de base appropriée
+FROM ubuntu:latest
 
 # Installer des dépendances (par exemple pour MySQL)
 RUN apt-get update && \
@@ -8,7 +8,8 @@ RUN apt-get update && \
     chmod +x xampp-linux-x64-7.4.10-0-installer.run && \
     ./xampp-linux-x64-7.4.10-0-installer.run
 
-# Exposer le port 80
-EXPOSE 80
+# Exposer le port pour accéder à XAMPP
+EXPOSE 8081
 
+# Commande pour démarrer XAMPP
 CMD ["/opt/lampp/lampp", "start"]
