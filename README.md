@@ -5,7 +5,7 @@
 - Jenkins : Lucas
 - Grafana/Loki : corentin
 
-## shcema projet
+## schema projet
 
 ```mermaid
 graph TD;
