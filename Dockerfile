@@ -5,6 +5,11 @@ FROM ubuntu:latest
 RUN apt-get update && \
     apt-get install -y git wget apache2 libapache2-mod-php php php-mysql
 
+ENTRYPOINT /usr/sbin/apache2ctl -D FOREGROUND
+
+# 
+RUN mv /var/www/html/index.html /var/www/html/index.html.old
+
 # Cloner le dépôt contenant le dossier 'Application'
 RUN git clone https://github.com/ChocoMacs/ProjetDEVOPS.git
 
