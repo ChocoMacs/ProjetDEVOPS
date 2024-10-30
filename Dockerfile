@@ -6,7 +6,6 @@ RUN apt-get update && \
     apt-get install -y git wget apache2 libapache2-mod-php php php-mysql
 
 # Créer le répertoire de travail
-WORKDIR /var/www/html
 
 # Initialiser un dépôt git et configurer le sparse checkout pour ne récupérer que le dossier 'application'
 RUN git clone https://github.com/ChocoMacs/ProjetDEVOPS.git
