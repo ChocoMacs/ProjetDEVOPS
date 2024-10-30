@@ -5,13 +5,14 @@ FROM ubuntu:latest
 RUN apt-get update && \
     apt-get install -y git wget apache2 libapache2-mod-php php php-mysql
 
-# Créer le répertoire de travail
-
-# Initialiser un dépôt git et configurer le sparse checkout pour ne récupérer que le dossier 'application'
+# Cloner le dépôt contenant le dossier 'Application'
 RUN git clone https://github.com/ChocoMacs/ProjetDEVOPS.git
-RUN cd Application && cp * /var/www/html/
+
+# Copier le contenu du dossier 'Application' vers le répertoire de document d'Apache
+RUN cp -r ProjetDEVOPS/Application/* /var/www/html/
+
 # Exposer les ports pour Apache
-EXPOSE 81 
+EXPOSE 81
 
 # Commande à exécuter lors du démarrage du conteneur
-CMD ["apache2ctl", "-D", "FOREGROUND"]
+CMD ["apachectl", "-D", "FOREGROUND"]
