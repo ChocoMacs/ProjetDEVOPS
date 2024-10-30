@@ -1,5 +1,5 @@
 # Utiliser l'image de base Ubuntu
-FROM alpine:latest
+FROM ubuntu:latest
 
 # Installer les dépendances nécessaires
 RUN apt-get update && \
