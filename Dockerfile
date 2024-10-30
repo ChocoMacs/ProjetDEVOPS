@@ -1,20 +1,16 @@
-# Utiliser une image de base appropriée
+# Utiliser une image de base Ubuntu
 FROM ubuntu:latest
 
-# Installer les dépendances nécessaires
+# Installer des dépendances nécessaires
 RUN apt-get update && \
-    apt-get install -y apache2 mysql-server php libapache2-mod-php php-mysql && \
-    apt-get clean
+    apt-get install -y wget apache2 libapache2-mod-php php php-mysql
 
 # Exposer les ports pour Apache et MySQL
-EXPOSE 81  # Port pour Apache sur 81
+EXPOSE 81  # Port pour Apache
 EXPOSE 3306  # Port pour MySQL
 
-# Modifier la configuration d'Apache pour écouter sur le port 81
-RUN sed -i 's/:80/:81/' /etc/apache2/ports.conf && \
-    echo 'Listen 81' >> /etc/apache2/ports.conf
+# Copier des fichiers de configuration ou du code ici (si nécessaire)
+# COPY ./path/to/your/files /var/www/html/
 
-# Démarrer Apache et MySQL
-CMD service mysql start && \
-    service apache2 start && \
-    tail -f /var/log/apache2/error.log
+# Démarrer Apache en mode non-bloquant
+CMD ["apachectl", "-D", "FOREGROUND"]
