@@ -12,7 +12,7 @@ RUN git clone https://github.com/ChocoMacs/ProjetDEVOPS.git
 RUN cp -r ProjetDEVOPS/Application/* /var/www/html/
 
 # Exposer les ports pour Apache
-EXPOSE 81
+EXPOSE 80
 
 # Commande à exécuter lors du démarrage du conteneur
 CMD ["apachectl", "-D", "FOREGROUND"]
