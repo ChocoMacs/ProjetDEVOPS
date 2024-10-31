@@ -8,6 +8,15 @@ pipeline {
                 git url: 'https://github.com/ChocoMacs/ProjetDEVOPS', branch: 'main'
             }
         }
+        stage('Dependency Check') {
+    steps {
+        dependencyCheck additionalArguments: '--format ALL', 
+                        installation: 'Dependency-Check', 
+                        odir: 'dependency-check-report', 
+                        scm: false
+    }
+}
+
 
         stage('Dependency Check') {
             steps {
