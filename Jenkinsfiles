@@ -47,7 +47,6 @@ pipeline {
             }
         }
     }
-
     post {
         success {
             echo 'CI pipeline executed successfully.'
@@ -56,4 +55,5 @@ pipeline {
             echo 'CI pipeline failed.'
         }
     }
+}
 }
