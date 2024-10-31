@@ -1,4 +1,11 @@
 pipeline {
+    agent any
+    
+    environment {
+        // Définir des variables pour SonarQube et Snyk
+        SONARQUBE_ENV = 'SonarQube' // Le nom de l'instance SonarQube dans Jenkins
+    }
+
     stages {
         stage('Checkout Code') {
             steps {
@@ -6,11 +13,7 @@ pipeline {
                 git url: 'https://github.com/ChocoMacs/ProjetDEVOPS', branch: 'main'
             }
         } 
-    agent any {
-    environment {
-        // Définir des variables pour SonarQube et Snyk
-        SONARQUBE_ENV = 'SonarQube' // Le nom de l'instance SonarQube dans Jenkins
-    }   
+
         stage('SonarQube Analysis') {
             steps {
                 script {
@@ -40,6 +43,7 @@ pipeline {
                 }
             }
         }
+
         stage('Build Docker Image') {
             steps {
                 // Construire l'image Docker si toutes les vérifications sont réussies
@@ -47,6 +51,7 @@ pipeline {
             }
         }
     }
+
     post {
         success {
             echo 'CI pipeline executed successfully.'
@@ -55,5 +60,4 @@ pipeline {
             echo 'CI pipeline failed.'
         }
     }
-}
 }
