@@ -8,23 +8,32 @@ pipeline {
                 git url: 'https://github.com/ChocoMacs/ProjetDEVOPS', branch: 'main'
             }
         }
-        stage('Dependency Check') {
-            steps {
-                script {
-                    // Scanner les dépendances pour les vulnérabilités avec OWASP Dependency-Check
-                    dependencyCheck additionalArguments: '--format ALL', 
-                                    installation: 'Dependency-Check', 
-                                    odir: 'dependency-check-report', 
-                                    scm: false
+        stage('Parallel Scans') {
+            parallel {
+                stage('Dependency Check') {
+                    steps {
+                        script {
+                            // Scanner les dépendances pour les vulnérabilités avec OWASP Dependency-Check
+                            dependencyCheck additionalArguments: '--format ALL', 
+                                            installation: 'Dependency-Check', 
+                                            odir: 'dependency-check-report', 
+                                            scm: false
+                        }
+                    }
                 }
-            }
-        }
-        stage('Trivy Vulnerability Scan') {
-            steps {
-                script {
-                    // Scanner l'image Docker pour les vulnérabilités critiques avec Trivy
-                    echo 'Running vulnerability scan with Trivy...'
-                    sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL choco-xampp:latest' // Assurez-vous que le nom de l'image est correct
+                stage('Trivy Vulnerability Scan') {
+                    steps {
+                        script {
+                            // List all Docker images and run Trivy scan on each
+                            echo 'Running vulnerability scan with Trivy on all Docker images...'
+                            sh '''
+                                images=$(docker images --format "{{.Repository}}:{{.Tag}}")
+                                for image in $images; do
+                                    trivy image --exit-code 1 --severity HIGH,CRITICAL $image
+                                done
+                            '''
+                        }
+                    }
                 }
             }
         }
