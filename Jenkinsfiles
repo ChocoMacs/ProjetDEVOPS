@@ -9,30 +9,22 @@ pipeline {
             }
         }
         stage('Dependency Check') {
-    steps {
-        dependencyCheck additionalArguments: '--format ALL', 
-                        installation: 'Dependency-Check', 
-                        odir: 'dependency-check-report', 
-                        scm: false
-    }
-}
-
-
-        stage('Dependency Check') {
             steps {
                 script {
                     // Scanner les dépendances pour les vulnérabilités avec OWASP Dependency-Check
-                    dependencyCheck additionalArguments: '--scan /usr/local/bin/dependency-check'
+                    dependencyCheck additionalArguments: '--format ALL', 
+                                    installation: 'Dependency-Check', 
+                                    odir: 'dependency-check-report', 
+                                    scm: false
                 }
             }
         }
-
         stage('Trivy Vulnerability Scan') {
             steps {
                 script {
                     // Scanner l'image Docker pour les vulnérabilités critiques avec Trivy
-                    echo 'Running vulnerability scan...'
-                    // Remplacer la commande par celle adaptée à votre environnement si nécessaire
+                    echo 'Running vulnerability scan with Trivy...'
+                    sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL choco-xampp:latest' // Assurez-vous que le nom de l'image est correct
                 }
             }
         }
