@@ -10,12 +10,12 @@ pipeline {
         }
         stage('Parallel Scans') {
             parallel {
-                stage('Dependency Check') {
+                stage('CheckChoco') {
                     steps {
                         script {
-                            // Scanner les dépendances pour les vulnérabilités avec OWASP Dependency-Check
+                            // Scanner les dépendances pour les vulnérabilités avec OWASP Dependency-Check (renamed and moved)
                             dependencyCheck additionalArguments: '--format ALL', 
-                                            installation: 'Dependency-Check', 
+                                            installation: '/var/lib/CheckChoco', 
                                             odir: 'dependency-check-report', 
                                             scm: false
                         }
