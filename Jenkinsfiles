@@ -13,7 +13,7 @@ pipeline {
             steps {
                 script {
                     // Scanner les dépendances pour les vulnérabilités avec OWASP Dependency-Check
-                    dependencyCheck additionalArguments: '--scan /.'
+                    dependencyCheck additionalArguments: '--scan /usr/local/bin/dependency-check'
                 }
             }
         }
