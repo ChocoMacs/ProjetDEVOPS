@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        PATH = "/usr/local/bin:/usr/bin:/bin:/path/to/trivy:/path/to/dependency-check"
+    }
+
     stages {
         stage('Checkout Code') {
             steps {
@@ -15,7 +19,7 @@ pipeline {
                         script {
                             // Scanner les dépendances pour les vulnérabilités avec OWASP Dependency-Check (renamed and moved)
                             dependencyCheck additionalArguments: '--format ALL', 
-                                            installation: '/var/lib/CheckChoco', 
+                                            installation: 'Dependency-Check', 
                                             odir: 'dependency-check-report', 
                                             scm: false
                         }
