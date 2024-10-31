@@ -1,0 +1,41 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                // Cloner le dépôt Git
+                git url: 'https://github.com/ChocoMacs/ProjetDEVOPS', branch: 'main'
+            }
+        }
+        stage('Dependency Check') {
+            steps {
+                script {
+                    // Scanner les dépendances pour les vulnérabilités avec OWASP Dependency-Check
+                    dependencyCheck additionalArguments: '--format ALL', 
+                                    installation: 'Dependency-Check', 
+                                    odir: 'dependency-check-report', 
+                                    scm: false
+                }
+            }
+        }
+        stage('Trivy Vulnerability Scan') {
+            steps {
+                script {
+                    // Scanner l'image Docker pour les vulnérabilités critiques avec Trivy
+                    echo 'Running vulnerability scan with Trivy...'
+                    sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL choco-xampp:latest' // Assurez-vous que le nom de l'image est correct
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Le pipeline CI s\'est terminé avec succès.'
+        }
+        failure {
+            echo 'Le pipeline CI a échoué.'
+        }
+    }
+}
