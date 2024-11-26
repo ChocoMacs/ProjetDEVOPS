@@ -1,9 +1,28 @@
 ---
-- name: Deploy Pods on Minikube
+- name: Déployer les pods Kubernetes avec Minikube
   hosts: localhost
+  become: yes
   tasks:
-    - name: Apply Kubernetes YAML files
-      k8s:
-        kubeconfig: "/root/.kube/config"  # Assurez-vous que le kubeconfig est monté correctement
-        state: present
-        src: "{{ yamlPath }}/*.yml"  # Applique tous les fichiers YAML dans le répertoire spécifié
+    - name: Démarrer Minikube (si ce n'est pas déjà fait)
+      shell: |
+        minikube start --driver=docker
+      register: minikube_status
+      changed_when: minikube_status.stdout | search("Started")
+
+    - name: Vérifier que Minikube est démarré
+      command: minikube status
+      register: minikube_status_check
+
+    - name: Déployer les pods à partir du fichier YAML
+      shell: |
+        kubectl apply -f /root/yamls/{{ item }}
+      loop:
+        - pod-deployment.yaml
+      when: minikube_status_check.stdout | search("Running")
+      notify:
+        - Vérifier les pods déployés
+
+  handlers:
+    - name: Vérifier les pods déployés
+      shell: kubectl get pods -A
+      when: minikube_status_check.stdout | search("Running")
