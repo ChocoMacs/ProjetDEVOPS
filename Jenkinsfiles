@@ -1,58 +1,41 @@
 pipeline {
     agent any
-
     environment {
-        PATH = "/usr/local/bin:/usr/bin:/bin:/path/to/trivy:/path/to/dependency-check"
+        DOCKER_IMAGE = 'minikube-image:latest'
     }
-
-    tools {
-        dependencyCheck 'Dependency-Check' // Specify the Dependency-Check installation
-    }
-
     stages {
         stage('Checkout Code') {
             steps {
-                // Cloner le dépôt Git
-                git url: 'https://github.com/ChocoMacs/ProjetDEVOPS', branch: 'main'
+                git 'https://github.com/ChocoMacs/ProjetDEVOPS.git'
             }
         }
-        stage('Parallel Scans') {
-            parallel {
-                stage('CheckChoco') {
-                    steps {
-                        script {
-                            // Scanner les dépendances pour les vulnérabilités avec OWASP Dependency-Check
-                            dependencyCheck additionalArguments: '--format ALL', 
-                                            installation: 'Dependency-Check', 
-                                            odir: 'dependency-check-report', 
-                                            scm: false
-                        }
-                    }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh 'docker build -t $DOCKER_IMAGE .'
                 }
-                stage('Trivy Vulnerability Scan') {
-                    steps {
-                        script {
-                            // List all Docker images and run Trivy scan on each
-                            echo 'Running vulnerability scan with Trivy on all Docker images...'
-                            sh '''
-                                images=$(docker images --format "{{.Repository}}:{{.Tag}}")
-                                for image in $images; do
-                                    trivy image --exit-code 1 --severity HIGH,CRITICAL $image
-                                done
-                            '''
-                        }
-                    }
+            }
+        }
+        stage('Run Docker Container') {
+            steps {
+                script {
+                    sh 'docker run -d --name minikube-container -v /var/run/docker.sock:/var/run/docker.sock -v ~/.kube:/root/.kube $DOCKER_IMAGE'
                 }
+            }
+        }
+        stage('Deploy Pods with Ansible') {
+            steps {
+                ansiblePlaybook(
+                    playbook: 'ansible/deploy-pods.yml',
+                    inventory: 'localhost,',
+                    colorized: true
+                )
             }
         }
     }
-
     post {
-        success {
-            echo 'Le pipeline CI s\'est terminé avec succès.'
-        }
-        failure {
-            echo 'Le pipeline CI a échoué.'
+        always {
+            echo 'Pipeline finished.'
         }
     }
 }
