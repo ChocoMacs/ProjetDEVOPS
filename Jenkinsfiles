@@ -5,6 +5,10 @@ pipeline {
         PATH = "/usr/local/bin:/usr/bin:/bin:/path/to/trivy:/path/to/dependency-check"
     }
 
+    tools {
+        dependencyCheck 'Dependency-Check' // Specify the Dependency-Check installation
+    }
+
     stages {
         stage('Checkout Code') {
             steps {
@@ -17,7 +21,7 @@ pipeline {
                 stage('CheckChoco') {
                     steps {
                         script {
-                            // Scanner les dépendances pour les vulnérabilités avec OWASP Dependency-Check (renamed and moved)
+                            // Scanner les dépendances pour les vulnérabilités avec OWASP Dependency-Check
                             dependencyCheck additionalArguments: '--format ALL', 
                                             installation: 'Dependency-Check', 
                                             odir: 'dependency-check-report', 
