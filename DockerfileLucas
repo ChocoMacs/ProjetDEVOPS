@@ -1,4 +1,4 @@
-# Utiliser l'image Alpine comme base
+# Utiliser une image de base Alpine
 FROM alpine:latest
 
 # Mettre à jour les paquets et installer les dépendances nécessaires
@@ -11,28 +11,19 @@ RUN apk update && apk add --no-cache \
     bash-completion \
     jq \
     docker \
-    && pip install --no-cache-dir ansible \
-    && curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 \
+    && pip install --no-cache-dir ansible
+
+# Télécharger et installer Minikube
+RUN curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 \
     && chmod +x minikube-linux-amd64 \
     && mv minikube-linux-amd64 /usr/local/bin/minikube
 
-# Installer kubectl
-RUN curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl" \
-    && chmod +x kubectl \
-    && mv kubectl /usr/local/bin/kubectl
-
-# Créer le répertoire pour Ansible et copier les fichiers YAML du dépôt GitHub
+# Définir un répertoire de travail dans le conteneur
 WORKDIR /root
-COPY . /root/
 
-# Définir le répertoire où les fichiers YAML seront stockés
-RUN mkdir -p /root/yamls
+# Copier les fichiers YAML depuis le dépôt GitHub dans le conteneur
+# Si les fichiers YAML sont directement dans le répertoire cloné du dépôt, utilisez cette étape
+COPY ./deploy-pods.yml /root/deploy-pods.yml
 
-# Copier les fichiers YAML dans le répertoire approprié
-COPY deploy-pods.yml /root/yamls/deploy-pods.yml
-
-# Exposer le port 80 pour le serveur web (si nécessaire)
-EXPOSE 80
-
-# Définir le point d'entrée pour le conteneur
+# Définir le conteneur pour qu'il reste en fonctionnement avec "sleep infinity"
 CMD ["sleep", "infinity"]
