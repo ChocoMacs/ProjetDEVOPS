@@ -1,7 +1,9 @@
+---
 - name: Deploy Pods on Minikube
   hosts: localhost
   tasks:
-    - name: Apply Kubernetes YAML configuration
-      community.kubernetes.k8s:
+    - name: Apply Kubernetes YAML files
+      k8s:
+        kubeconfig: "/root/.kube/config"  # Assurez-vous que le kubeconfig est monté correctement
         state: present
-        definition: "{{ lookup('file', 'pod-deployment.yaml') }}"
+        src: "{{ yamlPath }}/*.yml"  # Applique tous les fichiers YAML dans le répertoire spécifié
