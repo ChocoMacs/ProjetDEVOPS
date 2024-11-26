@@ -1,0 +1,7 @@
+- name: Deploy Pods on Minikube
+  hosts: localhost
+  tasks:
+    - name: Apply Kubernetes YAML configuration
+      community.kubernetes.k8s:
+        state: present
+        definition: "{{ lookup('file', 'pod-deployment.yaml') }}"
