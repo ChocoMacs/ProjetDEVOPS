@@ -1,0 +1,83 @@
+pipeline {
+    agent any
+
+    environment {
+        newImageNumber = 1 // Définir newImageNumber dans l'environnement
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Cloner le dépôt Git
+                git url: 'https://github.com/ChocoMacs/ProjetDEVOPS', branch: 'main'
+            }
+        }
+
+        stage('Build XAMPP') {
+            steps {
+                script {
+                    // Trouver le dernier numéro d'image utilisé, en ignorant les tags non numériques
+                    def imageCount = sh(script: 'docker images --format "{{.Repository}}:{{.Tag}}" | grep "choco-xampp:" | sed "s/choco-xampp://g" | grep -E "^[0-9]+$" | sort -n | tail -n 1 || echo 0', returnStdout: true).trim()
+
+                    // Vérifier si imageCount est vide et définir un nombre d'image par défaut
+                    newImageNumber = imageCount ? Integer.parseInt(imageCount) + 1 : 1
+
+                    // Construire l'image Docker à partir du Dockerfile avec le nouveau numéro
+                    def imageName = "choco-xampp:${newImageNumber}"
+                    def buildCommand = "docker build -t ${imageName} ."
+                    echo "Building Docker image with command: ${buildCommand}"
+                    sh buildCommand
+                }
+            }
+        }
+
+        stage('Deploy XAMPP') {
+            steps {
+                script {
+                    // Vérifier si un conteneur avec le même nom existe
+                    def existingContainer = sh(script: 'docker ps -aq --filter "name=choco-xampp"', returnStdout: true).trim()
+
+                    // Si un conteneur existe, le stopper et le supprimer
+                    if (existingContainer) {
+                        echo "Stopping existing container choco-xampp..."
+                        sh "docker stop ${existingContainer}"
+                        echo "Removing existing container choco-xampp..."
+                        sh "docker rm ${existingContainer}"
+                    }
+
+                    // Déployer l'image Docker construite
+                    def imageName = "choco-xampp:${newImageNumber}"
+                    echo "Running Docker container for XAMPP..."
+                    sh "docker run -d --name choco-xampp -p 80:80 ${imageName}"
+                }
+            }
+        }
+
+        stage('Deploy MySQL') {
+            steps {
+                script {
+                    // Vérifier si un conteneur MySQL existe et le stopper avant de le supprimer
+                    def mysqlContainer = sh(script: 'docker ps -q --filter "name=mysqlDB"', returnStdout: true).trim()
+                    if (mysqlContainer) {
+                        echo "Stopping existing container mysqlDB..."
+                        sh "docker stop ${mysqlContainer}"
+                        echo "Removing existing container mysqlDB..."
+                        sh "docker rm ${mysqlContainer}"
+                    }
+
+                    echo "Running Docker container for MySQL..."
+                    sh 'docker run --name mysqlDB -e MYSQL_ROOT_PASSWORD=root -hmysqlhost -d mysql:latest'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Le pipeline s\'est terminé avec succès.'
+        }
+        failure {
+            echo 'Le pipeline a échoué.'
+        }
+    }
+}
