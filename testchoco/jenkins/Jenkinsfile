@@ -19,7 +19,7 @@ pipeline {
         stage('Test Locally') {
             steps {
                 dir('./testchoco') {
-                    sh 'docker-compose up -d' && sh 'docker-compose down'
+                    sh 'docker-compose up -d' && sleep 10 && sh 'docker-compose down'
                 }
             }
         }
@@ -28,7 +28,7 @@ pipeline {
             steps {
                 dir('.') {
                     sh '''
-                    kubectl apply -f kubernetes/deployment.yaml
+                    kubectl apply -f kubernetes/deployement.yaml
                     kubectl apply -f kubernetes/service.yaml
                     kubectl apply -f kubernetes/pvc.yaml
                     '''
