@@ -3,42 +3,35 @@ import mysql.connector
 
 app = Flask(__name__)
 
-# Connexion à la base de données
-def get_db_connection():
-    return mysql.connector.connect(
-        host="db",  # Nom du service défini dans docker-compose.yml
-        user="root",
-        password="example",
-        database="mydatabase"
-    )
+# Configuration de la base de données
+db_config = {
+    'host': 'db',  # Le nom du conteneur de la base MySQL
+    'user': 'root',
+    'password': 'root',
+    'database': 'test_db'
+}
 
-# Page d'accueil
+# Route principale (page d'accueil)
 @app.route('/')
-def index():
-    return render_template('index.html')
+def home():
+    return render_template('index.html')  # Charge la page avec les boutons
 
-# Voir les tables de la base de données
+# Route pour afficher les tables
 @app.route('/tables')
-def show_tables():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SHOW TABLES")
-    tables = cursor.fetchall()
-    conn.close()
-    return render_template('show_tables.html', tables=tables)
+def view_tables():
+    try:
+        connection = mysql.connector.connect(**db_config)
+        cursor = connection.cursor()
+        cursor.execute("SHOW TABLES;")
+        tables = cursor.fetchall()
+        cursor.close()
+        connection.close()
+        return render_template('tables.html', tables=tables)
+    except Exception as e:
+        return f"Erreur : {e}"
 
-# Ajouter des informations dans une table
+# Route pour ajouter un commentaire
 @app.route('/add', methods=['GET', 'POST'])
-def add_info():
+def add_comment():
     if request.method == 'POST':
-        comment = request.form['comment']
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("INSERT INTO comments (text) VALUES (%s)", (comment,))
-        conn.commit()
-        conn.close()
-        return redirect(url_for('index'))
-    return render_template('add_info.html')
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+        name = request.form
