@@ -1,27 +1,20 @@
-version: '3.8'
-
+version: "3.9"
 services:
   app:
-    build:
-      context: .
+    build: ./app
     ports:
-      - "5000:5000"  # Redirige le port 5000 du conteneur vers localhost
+      - "5000:5000"
     depends_on:
-      - db  # Assure que la base de données démarre avant l'application
-    volumes:
-      - .:/app  # Permet de synchroniser les fichiers pour développement
-    environment:
-      - FLASK_ENV=development
+      - db
 
   db:
-    image: mysql:8.0
-    ports:
-      - "3306:3306"  # Port de MySQL
+    build: ./db
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: test_db
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+      - "3306:3306"
     volumes:
-      - db_data:/var/lib/mysql  # Assure la persistance des données
+      - db-data:/var/lib/mysql
 
 volumes:
-  db_data:
+  db-data:

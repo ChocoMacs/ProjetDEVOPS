@@ -1,30 +1,27 @@
 pipeline {
     agent {
-        docker { image 'docker:dind' }
-    }
-    environment {
-        DOCKER_CREDENTIALS_ID = 'docker-hub-credentials'  // Jenkins credentials
+        docker {
+            image 'docker:latest'
+        }
     }
     stages {
-        stage('Build App') {
+        stage('Build') {
             steps {
-                sh 'docker build -t my-simple-app:latest ./app'
-                sh 'docker build -t my-database:latest ./db'
+                sh 'docker-compose build'
             }
         }
-        stage('Push to Registry') {
+        stage('Test') {
             steps {
-                withDockerRegistry([credentialsId: "${DOCKER_CREDENTIALS_ID}", url: '']) {
-                    sh 'docker tag my-simple-app:latest yourdockerhubusername/my-simple-app:latest'
-                    sh 'docker tag my-database:latest yourdockerhubusername/my-database:latest'
-                    sh 'docker push yourdockerhubusername/my-simple-app:latest'
-                    sh 'docker push yourdockerhubusername/my-database:latest'
-                }
+                sh 'docker-compose up -d'
             }
         }
-        stage('Deploy to Kubernetes') {
+        stage('Deploy') {
             steps {
-                sh 'kubectl apply -f kubernetes/'
+                sh '''
+                kubectl apply -f kubernetes/deployment.yaml
+                kubectl apply -f kubernetes/service.yaml
+                kubectl apply -f kubernetes/pvc.yaml
+                '''
             }
         }
     }
