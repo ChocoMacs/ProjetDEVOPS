@@ -15,11 +15,11 @@ spec:
       imagePullSecrets: []  # Pas besoin de secrets si le registre est ouvert
       containers:
       - name: app
-        image: localhost:5001/myapp:latest  # Image de l'application
+        image: lchocomacs/devops:myapp  # Image de l'application
         ports:
         - containerPort: 5000
       - name: db
-        image: localhost:5001/mydb:latest  # Image pour la base de données
+        image: chocomacs/devops:mydb  # Image pour la base de données
         env:
         - name: MYSQL_ROOT_PASSWORD
           value: examplepassword
