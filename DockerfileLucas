@@ -1,30 +1,29 @@
-# Utiliser Alpine comme image de base
-FROM python:3.10-alpine
+# Utiliser une image de base Alpine
+FROM alpine:latest
 
-# Définir les variables d'environnement pour Minikube
-ENV MINIKUBE_VERSION=v1.26.0
-
-# Installer les dépendances nécessaires (Ansible, Docker, etc.)
+# Mettre à jour les paquets et installer les dépendances nécessaires
 RUN apk update && apk add --no-cache \
     bash \
     curl \
-    vim \
+    py3-pip \
     git \
+    openssh-client \
+    bash-completion \
+    jq \
     docker \
-    && pip install --upgrade pip \
-    && pip install ansible kubernetes \
-    && curl -Lo minikube https://github.com/kubernetes/minikube/releases/download/${MINIKUBE_VERSION}/minikube-linux-amd64 \
-    && chmod +x minikube \
-    && mv minikube /usr/local/bin/ \
-    && curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl \
-    && chmod +x kubectl \
-    && mv kubectl /usr/local/bin/
+    && pip install --no-cache-dir ansible
 
-# Créer un répertoire pour les fichiers YAML d'Ansible
-RUN mkdir /root/yamls
+# Télécharger et installer Minikube
+RUN curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 \
+    && chmod +x minikube-linux-amd64 \
+    && mv minikube-linux-amd64 /usr/local/bin/minikube
 
-# Définir le répertoire de travail
+# Définir un répertoire de travail dans le conteneur
 WORKDIR /root
 
-# Lancer Minikube (cela peut être configuré par Ansible plus tard)
-CMD ["minikube", "start"]
+# Copier les fichiers YAML depuis le dépôt GitHub dans le conteneur
+# Si les fichiers YAML sont directement dans le répertoire cloné du dépôt, utilisez cette étape
+COPY ./deploy-pods.yml /root/deploy-pods.yml
+
+# Définir le conteneur pour qu'il reste en fonctionnement avec "sleep infinity"
+CMD ["sleep", "infinity"]
