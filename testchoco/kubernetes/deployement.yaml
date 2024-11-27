@@ -12,38 +12,20 @@ spec:
       labels:
         app: my-simple-app
     spec:
+      imagePullSecrets: []  # Pas besoin de secrets si le registre est ouvert
       containers:
       - name: app
-        # Référencez l'image locale construite par Jenkins
-        image: testchoco_app:latest  # Remplacez 'myapp' par le nom de l'image que vous avez construite
+        image: localhost:5001/myapp:latest  # Image de l'application
         ports:
         - containerPort: 5000
-        resources:
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
       - name: db
-        # Utilisation d'une image officielle MySQL
-        image: testchoco_db:latest
+        image: localhost:5001/mydb:latest  # Image pour la base de données
         env:
         - name: MYSQL_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mysql-secret
-              key: MYSQL_ROOT_PASSWORD
+          value: examplepassword
         volumeMounts:
         - name: db-volume
           mountPath: /var/lib/mysql
-        resources:
-          limits:
-            memory: "1Gi"
-            cpu: "1000m"
-          requests:
-            memory: "512Mi"
-            cpu: "500m"
       volumes:
       - name: db-volume
         persistentVolumeClaim:
@@ -62,15 +44,3 @@ spec:
       port: 80
       targetPort: 5000
   type: LoadBalancer
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: db-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
