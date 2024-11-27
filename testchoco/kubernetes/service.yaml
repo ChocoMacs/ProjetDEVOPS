@@ -4,21 +4,9 @@ metadata:
   name: app-service
 spec:
   selector:
-    app: my-app
+    app: my-simple-app
   ports:
     - protocol: TCP
       port: 80
       targetPort: 5000
-  type: NodePort
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: db-service
-spec:
-  selector:
-    app: my-db
-  ports:
-    - protocol: TCP
-      port: 3306
-      targetPort: 3306
+  type: LoadBalancer

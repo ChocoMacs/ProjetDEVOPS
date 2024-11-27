@@ -3,38 +3,74 @@ kind: Deployment
 metadata:
   name: app-deployment
 spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: my-app
-  template:
-    metadata:
-      labels:
-        app: my-app
-    spec:
-      containers:
-      - name: app-container
-        image: my-app:latest
-        ports:
-        - containerPort: 5000
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: db-deployment
-spec:
   replicas: 1
   selector:
     matchLabels:
-      app: my-db
+      app: my-simple-app
   template:
     metadata:
       labels:
-        app: my-db
+        app: my-simple-app
     spec:
       containers:
-      - name: db-container
-        image: mysql:8.0
+      - name: app
+        # Référencez l'image locale construite par Jenkins
+        image: testchoco_app:latest  # Remplacez 'myapp' par le nom de l'image que vous avez construite
+        ports:
+        - containerPort: 5000
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+      - name: db
+        # Utilisation d'une image officielle MySQL
+        image: testchoco_db:latest
         env:
         - name: MYSQL_ROOT_PASSWORD
-          value: password
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: MYSQL_ROOT_PASSWORD
+        volumeMounts:
+        - name: db-volume
+          mountPath: /var/lib/mysql
+        resources:
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+      volumes:
+      - name: db-volume
+        persistentVolumeClaim:
+          claimName: db-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-service
+spec:
+  selector:
+    app: my-simple-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+  type: LoadBalancer
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

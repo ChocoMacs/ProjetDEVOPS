@@ -19,7 +19,7 @@ pipeline {
         stage('Test Locally') {
             steps {
                 dir('./testchoco') {
-                    sh 'docker-compose up -d'
+                    sh 'docker-compose up -d' && sh 'docker-compose down'
                 }
             }
         }
