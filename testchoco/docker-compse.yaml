@@ -1,0 +1,18 @@
+version: "3.7"
+services:
+  app:
+    build:
+      context: ./app
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+  db:
+    build:
+      context: ./db
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+volumes:
+  db_data:
