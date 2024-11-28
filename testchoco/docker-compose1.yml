@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  loki:
+    image: grafana/loki:2.9.1
+    container_name: loki
+    restart: unless-stopped
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml
+      - /var/log:/var/log
+    ports:
+      - "3100:3100"  # Port pour accéder à Loki
+    command:
+      - "-config.file=/etc/loki/local-config.yaml"
+    networks:
+      - loki-net
+
+  grafana:
+    image: grafana/grafana:9.6.7
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin  # Mot de passe administrateur
+    volumes:
+      - grafana-storage:/var/lib/grafana  # Persistance des données de Grafana
+    ports:
+      - "3000:3000"  # Port pour accéder à Grafana
+    depends_on:
+      - loki
+    networks:
+      - loki-net
+
+networks:
+  loki-net:
+    driver: bridge
+
+volumes:
+  grafana-storage:
