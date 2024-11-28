@@ -7,7 +7,7 @@ app = Flask(__name__)
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
-# Configuration de la base de données
+# Configuration de la base de données toto
 db_config = {
     "host": "127.0.0.1",  # Corrected host
     "port": 3306,         # Added port
