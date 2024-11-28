@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `users` (
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 delete from `users`;
-insert into `users` (`age`, `email`, `full_name`, `password`, `user_id`) values (34, 'coco@exemple.com', 'Compte Test', 'azerty1!', 1);
+insert into `users` (`age`, `email`, `full_name`, `password`, `user_id`) values (34, 'coco@exemple.com', 'Compte Test', 'Azerty1!', 1);
 insert into `users` (`age`, `email`, `full_name`, `password`, `user_id`) values (34, 'mathieu.nebra@exemple.com', 'Mathieu Nebra', 'MiamMiam', 2);
 insert into `users` (`age`, `email`, `full_name`, `password`, `user_id`) values (28, 'laurene.castor@exemple.com', 'Laurène Castor', 'laCasto28', 3);
 
