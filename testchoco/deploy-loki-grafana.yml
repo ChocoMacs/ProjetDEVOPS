@@ -1,0 +1,25 @@
+---
+- name: Deploy Loki and Grafana with Docker
+  hosts: your_vm  # Remplacez "your_vm" par votre hôte cible dans votre fichier hosts Ansible
+  become: true  # Utilise sudo pour l'exécution des tâches
+  tasks:
+    - name: Copy docker-compose1.yml to the target VM
+      ansible.builtin.copy:
+        src: ./docker-compose1.yml
+        dest: /home/user/docker-compose1.yml
+        owner: user
+        group: user
+        mode: '0644'
+
+    - name: Copy loki config to the target VM
+      ansible.builtin.copy:
+        src: ./loki-config.yaml
+        dest: /home/user/loki-config.yaml
+        owner: user
+        group: user
+        mode: '0644'
+
+    - name: Run Docker Compose to start Loki and Grafana
+      community.docker.docker_compose:
+        project_src: /home/user
+        restarted: true
