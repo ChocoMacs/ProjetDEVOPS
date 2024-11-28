@@ -27,7 +27,7 @@ spec:
           env:
             - name: DATABASE_HOST
               value: "db-service"  # Service pour la base de données
-            - name: DATABASE_PORT
+            <- name: DATABASE_PORT
               value: "3306"
             - name: MYSQL_DATABASE
               value: "mydatabase"
