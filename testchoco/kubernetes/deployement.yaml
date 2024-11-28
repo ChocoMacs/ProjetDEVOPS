@@ -2,45 +2,36 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: app-deployment
+  labels:
+    app: app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: my-simple-app
+      app: app
   template:
     metadata:
       labels:
-        app: my-simple-app
+        app: app
     spec:
-      imagePullSecrets: []  # Pas besoin de secrets si le registre est ouvert
       containers:
-      - name: app
-        image: lchocomacs/devops:myapp  # Image de l'application
-        ports:
-        - containerPort: 5000
-      - name: db
-        image: chocomacs/devops:mydb  # Image pour la base de données
-        env:
-        - name: MYSQL_ROOT_PASSWORD
-          value: examplepassword
-        volumeMounts:
-        - name: db-volume
-          mountPath: /var/lib/mysql
+        - name: app
+          image: chocomacs/devops:myapp  # Assurez-vous que l'image existe sur Docker Hub
+          ports:
+            - containerPort: 5000
+          env:
+            - name: DATABASE_HOST
+              value: "db-service"  # Service pour la base de données
+            - name: DATABASE_PORT
+              value: "3306"
+        - name: db
+          image: chocomacs/devops:mydb  # Assurez-vous que l'image existe sur Docker Hub
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: db-storage
+              mountPath: /var/lib/mysql
       volumes:
-      - name: db-volume
-        persistentVolumeClaim:
-          claimName: db-pvc
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: app-service
-spec:
-  selector:
-    app: my-simple-app
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 5000
-  type: LoadBalancer
+        - name: db-storage
+          persistentVolumeClaim:
+            claimName: db-pvc  # Assurez-vous que le PVC est défini dans pvc.yaml
