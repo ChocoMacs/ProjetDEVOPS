@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 # Configuration de la base de données super
 db_config = {
-    "host": "db",  # Corrected host
+    "host": "localhost",  # Corrected host
     "port": 3306,         # Added port
     "user": "root",
     "password": "root",
