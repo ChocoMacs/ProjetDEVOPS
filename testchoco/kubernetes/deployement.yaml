@@ -24,6 +24,12 @@ spec:
               value: "db-service"  # Service pour la base de données
             - name: DATABASE_PORT
               value: "3306"
+            - name: MYSQL_DATABASE
+              value: "mydatabase"
+            - name: MYSQL_USER
+              value: "root"
+            - name: MYSQL_PASSWORD
+              value: "root"
         - name: db
           image: chocomacs/devops:mydb  # Assurez-vous que l'image existe sur Docker Hub
           ports:
