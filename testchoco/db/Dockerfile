@@ -8,4 +8,4 @@ ENV MYSQL_USER=root
 COPY init.sql /docker-entrypoint-initdb.d/
 
 # Exposer le port MySQL
-EXPOSE 3306
+EXPOSE 3307
