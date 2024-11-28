@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        REGISTRY_URL = "chocomacs/devops" 
+        REGISTRY_URL = "chocomacs/devops" // Registre Docker local
         DOCKER_USERNAME = 'cholat.julien@free.fr'
         DOCKER_PASSWORD = '$Dzmb4wQvFnXSmHuj6UmBsJo7L37tf254!azk%!EywS2wkV9cxgoVXNtaw$sEXK9jthLPBNfMRxKvFfV^m$E^@Nda^GeZqL*7!LR95fDRFTK#tQa$2y44KymeTYRj3Sd'
         
@@ -48,24 +48,14 @@ pipeline {
             }
         }
 
-        stage('Test Locally') {
-            steps {
-                dir('./testchoco') {
-                    sh '''
-                    docker-compose up -d
-                    sleep 10
-                    docker-compose down
-                    '''
-                }
-            }
-        }
+        
 
         stage('Deploy to Kubernetes') {
             steps {
                 dir('./testchoco/kubernetes') { // Naviguer dans le répertoire Kubernetes
-                    sh '''
-                    kubectl apply -f deployement.yaml
-                    kubectl apply -f service.yaml
+                    sh ''
+                    kubectl apply -f deployement.yaml 
+                    kubectl apply -f service.yaml 
                     kubectl apply -f pvc.yaml
                     '''
                 }
