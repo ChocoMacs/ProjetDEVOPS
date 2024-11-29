@@ -11,8 +11,8 @@ logging.basicConfig(level=logging.DEBUG)
 db_config = {
     "host": "db",  # Corrected host
     "port": 3306,         # Added port
-    "user": "root",
-    "password": "root",
+    "user": "myapp",
+    "password": "password",
     "database": "mydatabase"
 }
 
