@@ -49,6 +49,13 @@ spec:
               value: "password"
           ports:
             - containerPort: 3306
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
           volumeMounts:
             - mountPath: /var/lib/mysql
               name: db-storage
@@ -86,8 +93,15 @@ spec:
           image: myapp:latest
           env:
             - name: DATABASE_HOST
-              value: "db"
-            - name: DATABASE_USER
+          ports:
+            - containerPort: 5000
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
               value: "myapp"
             - name: DATABASE_PASSWORD
               value: "password"
@@ -108,91 +122,3 @@ spec:
   selector:
     app: myapp
   type: NodePort
-  ---
-  apiVersion: apps/v1
-  kind: Deployment
-  metadata:
-    name: mydb
-  spec:
-    selector:
-      matchLabels:
-        app: mydb
-    replicas: 1
-    template:
-      metadata:
-        labels:
-          app: mydb
-      spec:
-        containers:
-          - name: mydb
-            image: chocomacs/devops:mydb
-            env:
-              - name: MYSQL_ROOT_PASSWORD
-                value: "rootpassword"
-              - name: MYSQL_DATABASE
-                value: "mydatabase"
-              - name: MYSQL_USER
-                value: "myapp"
-              - name: MYSQL_PASSWORD
-                value: "password"
-            ports:
-              - containerPort: 3306
-            volumeMounts:
-              - mountPath: /var/lib/mysql
-                name: db-storage
-        volumes:
-          - name: db-storage
-            persistentVolumeClaim:
-              claimName: db-pvc
-  ---
-  apiVersion: apps/v1
-  kind: Deployment
-  metadata:
-    name: myapp
-  spec:
-    selector:
-      matchLabels:
-        app: myapp
-    replicas: 1
-    template:
-      metadata:
-        labels:
-          app: myapp
-      spec:
-        containers:
-          - name: myapp
-            image: chocomacs/devops:myapp
-            env:
-              - name: DATABASE_HOST
-                value: "mydb"
-              - name: DATABASE_USER
-                value: "myapp"
-              - name: DATABASE_PASSWORD
-                value: "password"
-              - name: DATABASE_NAME
-                value: "mydatabase"
-            ports:
-              - containerPort: 5000
-        imagePullSecrets:
-          - name: regcred
-  ---
-  apiVersion: v1
-  kind: Service
-  metadata:
-    name: mydb
-  spec:
-    ports:
-      - port: 3306
-    selector:
-      app: mydb
-  ---
-  apiVersion: v1
-  kind: Service
-  metadata:
-    name: myapp
-  spec:
-    ports:
-      - port: 5000
-    selector:
-      app: myapp
-    type: NodePort
