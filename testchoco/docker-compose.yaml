@@ -4,19 +4,19 @@ services:
     build: ./app
     ports:
       - "5000:5000"
-    depends_on:
-      - db
     environment:
       DATABASE_HOST: db
       DATABASE_PORT: 3306
       DATABASE_USER: myapp
       DATABASE_PASSWORD: password
       DATABASE_NAME: mydatabase
-    networks:
-      - app-network
+    depends_on:
+      - db
 
   db:
-    build: ./db
+    image: mysql:8.0
+    container_name: mysql-db
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: mydatabase
@@ -26,11 +26,7 @@ services:
       - "3306:3306"
     volumes:
       - db-data:/var/lib/mysql
-    networks:
-      - app-network
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
 
 volumes:
   db-data:
-
-networks:
-  app-network:

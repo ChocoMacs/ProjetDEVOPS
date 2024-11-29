@@ -1,8 +1,4 @@
 CREATE DATABASE IF NOT EXISTS mydatabase;
-
 CREATE USER IF NOT EXISTS 'myapp'@'%' IDENTIFIED BY 'password';
-
 GRANT ALL PRIVILEGES ON mydatabase.* TO 'myapp'@'%';
-
 FLUSH PRIVILEGES;
-

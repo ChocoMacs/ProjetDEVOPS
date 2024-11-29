@@ -9,11 +9,11 @@ logging.basicConfig(level=logging.DEBUG)
 
 # Configuration de la base de données super
 db_config = {
-    "host": "db",  # Corrected host
-    "port": 3306,         # Added port
-    "user": "myapp",
-    "password": "password",
-    "database": "mydatabase"
+    'host': os.getenv('DATABASE_HOST', 'db'),
+    'port': int(os.getenv('DATABASE_PORT', 3306)),
+    'user': os.getenv('DATABASE_USER', 'myapp'),
+    'password': os.getenv('DATABASE_PASSWORD', 'password'),
+    'database': os.getenv('DATABASE_NAME', 'mydatabase')
 }
 
 @app.route("/")
