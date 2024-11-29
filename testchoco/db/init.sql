@@ -1,12 +1,8 @@
 CREATE DATABASE IF NOT EXISTS mydatabase;
-USE mydatabase;
 
-GRANT ALL PRIVILEGES ON mydatabase.* TO 'myapp'@'localhost';
+CREATE USER IF NOT EXISTS 'myapp'@'%' IDENTIFIED BY 'password';
 
-CREATE TABLE IF NOT EXISTS comments (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    content TEXT NOT NULL
-);
+GRANT ALL PRIVILEGES ON mydatabase.* TO 'myapp'@'%';
 
 FLUSH PRIVILEGES;
 
