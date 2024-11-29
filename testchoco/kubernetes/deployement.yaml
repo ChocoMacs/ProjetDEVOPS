@@ -93,6 +93,11 @@ spec:
           image: myapp:latest
           env:
             - name: DATABASE_HOST
+              value: "db"
+            - name: DATABASE_PASSWORD
+              value: "password"
+            - name: DATABASE_NAME
+              value: "mydatabase"
           ports:
             - containerPort: 5000
           resources:
@@ -102,13 +107,6 @@ spec:
             requests:
               memory: "256Mi"
               cpu: "250m"
-              value: "myapp"
-            - name: DATABASE_PASSWORD
-              value: "password"
-            - name: DATABASE_NAME
-              value: "mydatabase"
-          ports:
-            - containerPort: 5000
       imagePullSecrets:
         - name: regcred
 ---
