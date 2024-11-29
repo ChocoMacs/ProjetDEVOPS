@@ -12,6 +12,8 @@ services:
       DATABASE_USER: myapp
       DATABASE_PASSWORD: password
       DATABASE_NAME: mydatabase
+    networks:
+      - app-network
 
   db:
     build: ./db
@@ -24,6 +26,11 @@ services:
       - "3306:3306"
     volumes:
       - db-data:/var/lib/mysql
+    networks:
+      - app-network
 
 volumes:
   db-data:
+
+networks:
+  app-network:
