@@ -1,44 +1,110 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: db-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-deployment
-  labels:
-    app: app
+  name: db
 spec:
-  replicas: 1
   selector:
     matchLabels:
-      app: app
+      app: db
+  replicas: 1
   template:
     metadata:
       labels:
-        app: app
+        app: db
     spec:
       containers:
-        - name: app
-          image: chocomacs/devops:myapp  # Assurez-vous que l'image existe sur Docker Hub
-          ports:
-            - containerPort: 5000
-          
         - name: db
-          image: chocomacs/devops:mydb  # Assurez-vous que l'image existe sur Docker Hub
-          ports:
-            - containerPort: 3306
+          image: mysql:5.7
           env:
-            - name: DATABASE_HOST
-              value: "db-service"  # Service pour la base de données
-            - name: DATABASE_PORT
-              value: "3306"
+            - name: MYSQL_ROOT_PASSWORD
+              value: "rootpassword"
             - name: MYSQL_DATABASE
               value: "mydatabase"
             - name: MYSQL_USER
-              value: "root"
+              value: "myapp"
             - name: MYSQL_PASSWORD
-              value: "root"
+              value: "password"
+          ports:
+            - containerPort: 3306
           volumeMounts:
-            - name: db-storage
-              mountPath: /var/lib/mysql
+            - mountPath: /var/lib/mysql
+              name: db-storage
       volumes:
         - name: db-storage
           persistentVolumeClaim:
-            claimName: db-pvc  # Assurez-vous que le PVC est défini dans pvc.yaml
+            claimName: db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: db
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+spec:
+  selector:
+    matchLabels:
+      app: myapp
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+        - name: myapp
+          image: myapp:latest
+          env:
+            - name: DATABASE_HOST
+              value: "db"
+            - name: DATABASE_USER
+              value: "myapp"
+            - name: DATABASE_PASSWORD
+              value: "password"
+            - name: DATABASE_NAME
+              value: "mydatabase"
+          ports:
+            - containerPort: 5000
+      imagePullSecrets:
+        - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp
+spec:
+  ports:
+    - port: 5000
+  selector:
+    app: myapp
+  type: NodePort
