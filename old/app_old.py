@@ -1,18 +1,21 @@
-import os
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 import mysql.connector
-from flask import Flask, request, jsonify, render_template, redirect, url_for
 import logging
+import os
 
 app = Flask(__name__)
 
-# Connexion à la base de données
-def get_db_connection():
-    return mysql.connector.connect(
-        host=os.getenv('DATABASE_HOST', 'db'),
-        user=os.getenv('DATABASE_USER', 'myapp'),
-        password=os.getenv('DATABASE_PASSWORD', 'password'),
-        database=os.getenv('DATABASE_NAME', 'mydatabase')
-    )
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+
+# Configuration de la base de données super
+db_config = {
+    'host': os.getenv('DATABASE_HOST', 'db'),
+    'port': int(os.getenv('DATABASE_PORT', 3306)),
+    'user': os.getenv('DATABASE_USER', 'myapp'),
+    'password': os.getenv('DATABASE_PASSWORD', 'password'),
+    'database': os.getenv('DATABASE_NAME', 'mydatabase')
+}
 
 @app.route("/")
 def index():
@@ -22,9 +25,9 @@ def index():
 def add_comment():
     try:
         comment = request.form.get("comment")
-        connection = get_db_connection()
+        connection = mysql.connector.connect(**db_config)
         cursor = connection.cursor()
-        cursor.execute("INSERT INTO comments (comment_text) VALUES (%s)", (comment,))
+        cursor.execute("INSERT INTO comments (content) VALUES (%s)", (comment,))
         connection.commit()
         cursor.close()
         connection.close()
@@ -36,9 +39,9 @@ def add_comment():
 @app.route("/view_comments", methods=["GET"])
 def view_comments():
     try:
-        connection = get_db_connection()
+        connection = mysql.connector.connect(**db_config)
         cursor = connection.cursor()
-        cursor.execute("SELECT comment_text FROM comments")
+        cursor.execute("SELECT content FROM comments")
         comments = cursor.fetchall()
         cursor.close()
         connection.close()
