@@ -1,6 +1,3 @@
--- Supprimer la base de données si elle existe déjà
-DROP DATABASE IF EXISTS mydatabase;
-
 -- Créer la base de données
 CREATE DATABASE IF NOT EXISTS mydatabase;
 
